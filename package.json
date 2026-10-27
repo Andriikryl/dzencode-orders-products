@@ -7,16 +7,27 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "socket": "node socket-server/index.js",
+    "dev:all": "concurrently -n nuxt,socket -c green,cyan \"pnpm dev\" \"pnpm socket\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "bootstrap": "5",
     "bootstrap-icons": "^1.13.2",
     "dayjs": "^1.11.23",
     "nuxt": "^4.6.2",
+    "socket.io": "^4.8.4",
     "socket.io-client": "^4.8.4",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0",
     "vuex": "4"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.106.1"
   }
 }
