@@ -137,6 +137,7 @@ docker compose down
 | `pnpm preview`      | serve the production build      |
 | `pnpm test`         | run every test                  |
 | `pnpm test:watch`   | tests in watch mode             |
+| `pnpm typecheck`    | TypeScript check                |
 | `pnpm lint`         | ESLint check                    |
 | `pnpm lint:fix`     | ESLint autofix                  |
 | `pnpm format`       | format with Prettier            |
