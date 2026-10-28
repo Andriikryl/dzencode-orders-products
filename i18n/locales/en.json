@@ -40,6 +40,10 @@
     "title": "Dashboard",
     "productsByType": "Products by type",
     "warehouses": "Warehouses",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "activity": "Recent events",
+    "activityEmpty": "No events yet. Open or delete an order.",
+    "graph": "Orders and types",
+    "workerTotals": "Totals computed in a Web Worker"
   }
 }

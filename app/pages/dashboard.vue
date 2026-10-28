@@ -2,12 +2,16 @@
 import { useAppStore } from '~/composables/useAppStore'
 import { useLocaleFormat } from '~/composables/useLocaleFormat'
 import { sumByCurrency } from '~/utils/format'
+import { useTotalsWorker } from '~/composables/useTotalsWorker'
 
 const { t } = useI18n()
 useHead({ title: () => `${t('dashboard.title')} — Inventory` })
 
 const store = useAppStore()
 const { amount } = useLocaleFormat()
+
+const products = computed(() => store.state.products)
+const { result: workerTotals, pending: workerPending } = useTotalsWorker(products)
 
 const totals = computed(() => {
   const prices = store.state.products.map((product) => product.price)
@@ -55,6 +59,33 @@ const totals = computed(() => {
       </section>
 
       <section class="dashboard__panel card-row">
+        <h2 class="dashboard__panel-title">{{ $t('dashboard.graph') }}</h2>
+        <ClientOnly>
+          <LazyOrderGraph />
+          <template #fallback>
+            <div class="dashboard__placeholder">{{ $t('dashboard.loading') }}</div>
+          </template>
+        </ClientOnly>
+      </section>
+
+      <section class="dashboard__panel card-row">
+        <h2 class="dashboard__panel-title">{{ $t('dashboard.workerTotals') }}</h2>
+        <ClientOnly>
+          <div v-if="workerPending" class="dashboard__placeholder">{{ $t('dashboard.loading') }}</div>
+          <ol v-else-if="workerTotals" class="dashboard__worker">
+            <li v-for="row in workerTotals.totals.slice(0, 5)" :key="row.orderId">
+              <span>#{{ row.orderId }}</span>
+              <span>{{ row.count }}</span>
+              <span>{{ amount(row.uah) }} UAH</span>
+            </li>
+          </ol>
+          <template #fallback>
+            <div class="dashboard__placeholder">{{ $t('dashboard.loading') }}</div>
+          </template>
+        </ClientOnly>
+      </section>
+
+      <section class="dashboard__panel card-row">
         <h2 class="dashboard__panel-title">{{ $t('dashboard.warehouses') }}</h2>
         <ClientOnly>
           <LazyWarehouseMap />
@@ -64,6 +95,8 @@ const totals = computed(() => {
         </ClientOnly>
       </section>
     </div>
+
+    <ActivityFeed class="dashboard__activity" />
   </div>
 </template>
 
@@ -113,6 +146,24 @@ const totals = computed(() => {
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 16px;
+}
+
+.dashboard__worker {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard__worker li {
+  display: grid;
+  grid-template-columns: 60px 50px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--c-border);
+}
+
+.dashboard__activity {
+  margin-top: 24px;
 }
 
 .dashboard__placeholder {
