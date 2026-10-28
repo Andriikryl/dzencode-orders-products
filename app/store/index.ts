@@ -1,6 +1,7 @@
 import { createStore, type Store } from 'vuex'
 import type { InjectionKey } from 'vue'
 import type { Order, Product } from '~/types'
+import type { DomainEvent } from '~/lib/events'
 
 export interface RootState {
   orders: Order[]
@@ -9,6 +10,7 @@ export interface RootState {
   openOrderId: number | null
   typeFilter: string
   activeSessions: number
+  events: Array<{ id: number; event: DomainEvent; at: string }>
   loading: boolean
   error: string | null
 }
@@ -24,6 +26,7 @@ export function buildStore() {
       openOrderId: null,
       typeFilter: '',
       activeSessions: 0,
+      events: [],
       loading: false,
       error: null,
     }),
@@ -65,6 +68,12 @@ export function buildStore() {
       },
       SET_ACTIVE_SESSIONS(state, count: number) {
         state.activeSessions = count
+      },
+      PUSH_EVENT(state, event: DomainEvent) {
+        state.events = [
+          { id: state.events.length, event, at: new Date().toLocaleTimeString() },
+          ...state.events,
+        ].slice(0, 20)
       },
       REMOVE_ORDER(state, id: number) {
         state.orders = state.orders.filter((order) => order.id !== id)

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { Order, Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
+import { useDomainEvents } from '~/composables/useDomainEvents'
 
 const { t } = useI18n()
 
 useHead({ title: () => `${t('orders.title')} — Inventory` })
 
 const store = useAppStore()
+const { emit } = useDomainEvents()
 
 const orders = computed<Order[]>(() => store.state.orders)
 const productsByOrder = computed<Record<number, Product[]>>(() => store.getters.productsByOrder)
@@ -46,12 +48,26 @@ function closeDialog() {
 }
 
 function confirmDelete() {
-  if (productPendingDelete.value) {
-    store.commit('REMOVE_PRODUCT', productPendingDelete.value.id)
-  } else if (orderPendingDelete.value) {
-    store.commit('REMOVE_ORDER', orderPendingDelete.value.id)
+  const product = productPendingDelete.value
+  const order = orderPendingDelete.value
+
+  if (product) {
+    store.commit('REMOVE_PRODUCT', product.id)
+    emit({ type: 'product:deleted', productId: product.id, title: product.title, orderId: product.order })
+  } else if (order) {
+    const count = products(order.id).length
+    store.commit('REMOVE_ORDER', order.id)
+    emit({ type: 'order:deleted', orderId: order.id, title: order.title, productCount: count })
   }
+
   closeDialog()
+}
+
+function selectOrder(order: Order) {
+  store.dispatch('toggleOrder', order.id)
+  if (store.state.openOrderId === order.id) {
+    emit({ type: 'order:opened', orderId: order.id, title: order.title })
+  }
 }
 </script>
 
@@ -71,7 +87,7 @@ function confirmDelete() {
           :products="products(order.id)"
           :compact="Boolean(openOrder)"
           :active="order.id === openOrderId"
-          @select="store.dispatch('toggleOrder', order.id)"
+          @select="selectOrder(order)"
           @remove="orderPendingDelete = order"
         />
       </TransitionGroup>

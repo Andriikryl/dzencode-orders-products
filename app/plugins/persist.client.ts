@@ -1,4 +1,5 @@
-import { useAppStore } from '~/composables/useAppStore'
+import type { Store } from 'vuex'
+import type { RootState } from '~/store'
 
 const STORAGE_KEY = 'inventory.ui'
 
@@ -27,8 +28,8 @@ function write(value: PersistedUi): void {
 export default defineNuxtPlugin({
   name: 'persist-ui',
   dependsOn: ['vuex'],
-  setup() {
-    const store = useAppStore()
+  setup(nuxtApp) {
+    const store = nuxtApp.$store as Store<RootState>
     const saved = read()
 
     if (saved) {

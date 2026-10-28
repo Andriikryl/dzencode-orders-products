@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
+import { useDomainEvents } from '~/composables/useDomainEvents'
 import { useLocaleFormat } from '~/composables/useLocaleFormat'
 
 const { t } = useI18n()
@@ -8,6 +9,7 @@ const { t } = useI18n()
 useHead({ title: () => `${t('products.title')} — Inventory` })
 
 const store = useAppStore()
+const { emit } = useDomainEvents()
 const { shortDate, longDate, amount } = useLocaleFormat()
 
 const filtered = computed<Product[]>(() => store.getters.filteredProducts)
@@ -15,7 +17,10 @@ const types = computed<string[]>(() => store.state.productTypes)
 
 const typeFilter = computed({
   get: () => store.state.typeFilter,
-  set: (value: string) => store.commit('SET_TYPE_FILTER', value),
+  set: (value: string) => {
+    store.commit('SET_TYPE_FILTER', value)
+    emit({ type: 'filter:changed', value })
+  },
 })
 
 const orderTitles = computed<Record<number, string>>(() =>
@@ -30,8 +35,10 @@ function priceIn(product: Product, symbol: 'USD' | 'UAH'): string {
 const productPendingDelete = ref<Product | null>(null)
 
 function confirmDelete() {
-  if (productPendingDelete.value) {
-    store.commit('REMOVE_PRODUCT', productPendingDelete.value.id)
+  const product = productPendingDelete.value
+  if (product) {
+    store.commit('REMOVE_PRODUCT', product.id)
+    emit({ type: 'product:deleted', productId: product.id, title: product.title, orderId: product.order })
   }
   productPendingDelete.value = null
 }
