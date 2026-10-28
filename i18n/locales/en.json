@@ -1,6 +1,13 @@
 {
-  "nav": { "orders": "Orders", "products": "Products" },
-  "topMenu": { "search": "Search", "sessions": "Active sessions" },
+  "nav": {
+    "orders": "Orders",
+    "products": "Products",
+    "dashboard": "Dashboard"
+  },
+  "topMenu": {
+    "search": "Search",
+    "sessions": "Active sessions"
+  },
   "orders": {
     "title": "Orders",
     "add": "Add order",
@@ -28,5 +35,11 @@
     "cancel": "Cancel",
     "confirm": "Delete",
     "close": "Close"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "productsByType": "Products by type",
+    "warehouses": "Warehouses",
+    "loading": "Loading..."
   }
 }

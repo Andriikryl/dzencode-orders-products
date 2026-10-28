@@ -1,6 +1,13 @@
 {
-  "nav": { "orders": "Приход", "products": "Продукты" },
-  "topMenu": { "search": "Поиск", "sessions": "Активных сессий" },
+  "nav": {
+    "orders": "Приход",
+    "products": "Продукты",
+    "dashboard": "Сводка"
+  },
+  "topMenu": {
+    "search": "Поиск",
+    "sessions": "Активных сессий"
+  },
   "orders": {
     "title": "Приходы",
     "add": "Добавить приход",
@@ -28,5 +35,11 @@
     "cancel": "Отменить",
     "confirm": "Удалить",
     "close": "Закрыть"
+  },
+  "dashboard": {
+    "title": "Сводка",
+    "productsByType": "Продукты по типам",
+    "warehouses": "Склады",
+    "loading": "Загрузка..."
   }
 }
