@@ -35,7 +35,9 @@ const search = computed({
 })
 
 const { locale, locales, setLocale } = useI18n()
-const localeOptions = computed(() => locales.value.map((item) => (typeof item === 'string' ? { code: item, name: item } : item)))
+const localeOptions = computed(() =>
+  locales.value.map((item) => (typeof item === 'string' ? { code: item, name: item } : item)),
+)
 </script>
 
 <template>
@@ -52,7 +54,7 @@ const localeOptions = computed(() => locales.value.map((item) => (typeof item ==
         class="form-control"
         :placeholder="$t('topMenu.search')"
         :aria-label="$t('topMenu.search')"
-      >
+      />
     </div>
 
     <div class="top-menu__meta">

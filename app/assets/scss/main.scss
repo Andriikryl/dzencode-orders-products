@@ -35,7 +35,9 @@ a {
 .page-leave-active,
 .layout-enter-active,
 .layout-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
 .page-enter-from,
@@ -54,7 +56,9 @@ a {
   --bs-card-border-color: var(--c-border);
   --bs-card-border-radius: var(--radius);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   &--clickable {
     cursor: pointer;

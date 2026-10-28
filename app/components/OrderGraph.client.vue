@@ -106,7 +106,11 @@ onBeforeUnmount(() => {
       :stroke-width="Math.min(link.value, 4)"
     />
 
-    <g v-for="node in nodes" :key="node.id" :transform="`translate(${node.x ?? 0}, ${node.y ?? 0})`">
+    <g
+      v-for="node in nodes"
+      :key="node.id"
+      :transform="`translate(${node.x ?? 0}, ${node.y ?? 0})`"
+    >
       <circle
         class="order-graph__node"
         :class="`order-graph__node--${node.kind}`"

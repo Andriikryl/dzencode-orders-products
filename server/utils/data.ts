@@ -31,10 +31,7 @@ export const orders: Order[] = Array.from({ length: ORDER_COUNT }, (_, i) => {
   const day = ((i * 3) % 27) + 1
   return {
     id,
-    title:
-      id % 3 === 0
-        ? `Длинное предлинное длиннючее название прихода ${id}`
-        : `Приход ${id}`,
+    title: id % 3 === 0 ? `Длинное предлинное длиннючее название прихода ${id}` : `Приход ${id}`,
     date: stamp(2017, month, day),
     description: `Описание прихода ${id}`,
   }
@@ -59,8 +56,8 @@ export const products: Product[] = orders.flatMap((order, orderIndex) => {
       type,
       specification: `Specification ${globalIndex + 1}`,
       guarantee: {
-        start: stamp(2017, ((globalIndex % 12) + 1), 6),
-        end: stamp(2018, ((globalIndex % 12) + 1), 6),
+        start: stamp(2017, (globalIndex % 12) + 1, 6),
+        end: stamp(2018, (globalIndex % 12) + 1, 6),
       },
       price: [
         { value: usd, symbol: 'USD', isDefault: 0 },

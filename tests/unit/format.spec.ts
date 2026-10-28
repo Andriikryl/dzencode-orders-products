@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { formatAmount, formatLongDate, formatShortDate, sumByCurrency } from '../../app/utils/format'
+import {
+  formatAmount,
+  formatLongDate,
+  formatShortDate,
+  sumByCurrency,
+} from '../../app/utils/format'
 import type { Price } from '../../app/types'
 
 describe('formatShortDate', () => {
