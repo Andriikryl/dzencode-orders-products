@@ -29,9 +29,10 @@ export function formatAmount(value: number, locale = 'ru'): string {
   })
 }
 
+export function priceBySymbol(prices: Price[], symbol: Price['symbol']): number | null {
+  return prices.find((price) => price.symbol === symbol)?.value ?? null
+}
+
 export function sumByCurrency(prices: Price[][], symbol: Price['symbol']): number {
-  return prices.reduce((total, list) => {
-    const entry = list.find((price) => price.symbol === symbol)
-    return total + (entry?.value ?? 0)
-  }, 0)
+  return prices.reduce((total, list) => total + (priceBySymbol(list, symbol) ?? 0), 0)
 }

@@ -2,7 +2,6 @@
 import type { Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
 import { useDomainEvents } from '~/composables/useDomainEvents'
-import { useLocaleFormat } from '~/composables/useLocaleFormat'
 
 const { t } = useI18n()
 
@@ -10,7 +9,6 @@ useHead({ title: () => `${t('products.title')} — Inventory` })
 
 const store = useAppStore()
 const { emit } = useDomainEvents()
-const { shortDate, longDate, amount } = useLocaleFormat()
 
 const filtered = computed<Product[]>(() => store.getters.filteredProducts)
 const types = computed<string[]>(() => store.state.productTypes)
@@ -27,18 +25,18 @@ const orderTitles = computed<Record<number, string>>(() =>
   Object.fromEntries(store.state.orders.map((order) => [order.id, order.title])),
 )
 
-function priceIn(product: Product, symbol: 'USD' | 'UAH'): string {
-  const entry = product.price.find((price) => price.symbol === symbol)
-  return entry ? amount(entry.value) : '—'
-}
-
 const productPendingDelete = ref<Product | null>(null)
 
 function confirmDelete() {
   const product = productPendingDelete.value
   if (product) {
     store.commit('REMOVE_PRODUCT', product.id)
-    emit({ type: 'product:deleted', productId: product.id, title: product.title, orderId: product.order })
+    emit({
+      type: 'product:deleted',
+      productId: product.id,
+      title: product.title,
+      orderId: product.order,
+    })
   }
   productPendingDelete.value = null
 }
@@ -59,56 +57,13 @@ function confirmDelete() {
     </header>
 
     <TransitionGroup name="list" tag="div" class="products__list">
-      <article v-for="product in filtered" :key="product.id" class="product-row card surface">
-        <span
-          class="product-row__status"
-          :class="{ 'product-row__status--busy': product.status !== 'free' }"
-        />
-
-        <ProductPhoto :type="product.type" class="product-row__photo" />
-
-        <div class="product-row__name">
-          <div class="product-row__title">{{ product.title }}</div>
-          <div class="product-row__sn">SN-{{ product.serialNumber }}</div>
-        </div>
-
-        <span
-          class="badge rounded-pill product-row__state"
-          :class="product.status === 'free' ? 'text-bg-light' : 'text-bg-secondary'"
-        >
-          {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
-        </span>
-
-        <div class="product-row__guarantee">
-          <div><span class="text-muted-sm">{{ $t('products.from') }}</span> {{ longDate(product.guarantee.start) }}</div>
-          <div><span class="text-muted-sm">{{ $t('products.to') }}</span> {{ longDate(product.guarantee.end) }}</div>
-        </div>
-
-        <div class="product-row__condition">{{ product.isNew ? $t('products.new') : $t('products.used') }}</div>
-
-        <div class="product-row__price">
-          <div class="text-muted-sm">{{ priceIn(product, 'USD') }} $</div>
-          <div>{{ priceIn(product, 'UAH') }} <span class="product-row__currency">UAH</span></div>
-        </div>
-
-        <div class="product-row__type">{{ product.type }}</div>
-
-        <div class="product-row__order">{{ orderTitles[product.order] ?? '—' }}</div>
-
-        <div class="product-row__date">
-          <div class="text-muted-sm">{{ shortDate(product.date) }}</div>
-          <div>{{ longDate(product.date) }}</div>
-        </div>
-
-        <button
-          type="button"
-          class="product-row__delete"
-          :aria-label="$t('products.delete')"
-          @click="productPendingDelete = product"
-        >
-          <i class="bi bi-trash" />
-        </button>
-      </article>
+      <ProductRow
+        v-for="product in filtered"
+        :key="product.id"
+        :product="product"
+        :order-title="orderTitles[product.order]"
+        @remove="productPendingDelete = product"
+      />
     </TransitionGroup>
 
     <p v-if="!filtered.length" class="products__empty">
@@ -156,76 +111,6 @@ function confirmDelete() {
   gap: 12px;
 }
 
-.product-row {
-  display: grid;
-  grid-template-columns: 12px 56px minmax(180px, 1.4fr) 110px 170px 80px 150px 110px minmax(140px, 1fr) 130px 32px;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
-}
-
-.product-row__status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--c-accent);
-}
-
-.product-row__status--busy {
-  background: #4d4d4d;
-}
-
-.product-row__photo {
-  width: 52px;
-  height: 38px;
-}
-
-.product-row__name {
-  min-width: 0;
-}
-
-.product-row__title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.product-row__sn {
-  color: var(--c-text-muted);
-  font-size: 12px;
-}
-
-.product-row__state {
-  color: var(--c-accent);
-}
-
-.product-row__state--busy {
-  color: var(--c-text);
-}
-
-.product-row__order {
-  text-decoration: underline;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.product-row__currency {
-  font-size: 11px;
-  color: var(--c-text-muted);
-}
-
-.product-row__delete {
-  border: none;
-  background: transparent;
-  color: var(--c-text-muted);
-  cursor: pointer;
-}
-
-.product-row__delete:hover {
-  color: #d9534f;
-}
-
 .products__empty {
   color: var(--c-text-muted);
 }
@@ -240,30 +125,5 @@ function confirmDelete() {
 .list-leave-to {
   opacity: 0;
   transform: translateX(-16px);
-}
-
-@media (max-width: 1400px) {
-  .product-row {
-    grid-template-columns: 12px 56px minmax(0, 1fr) 110px 150px 110px 32px;
-  }
-
-  .product-row__condition,
-  .product-row__type,
-  .product-row__order,
-  .product-row__date {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .product-row {
-    grid-template-columns: 12px 48px minmax(0, 1fr) 32px;
-  }
-
-  .product-row__state,
-  .product-row__guarantee,
-  .product-row__price {
-    display: none;
-  }
 }
 </style>

@@ -43,12 +43,7 @@ const emit = defineEmits<{
           <span class="order-details__sn">SN-{{ product.serialNumber }}</span>
         </span>
 
-        <span
-          class="badge rounded-pill order-details__state"
-          :class="product.status === 'free' ? 'text-bg-light' : 'text-bg-secondary'"
-        >
-          {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
-        </span>
+        <ProductStatusBadge :status="product.status" class="order-details__state" />
 
         <button
           type="button"
