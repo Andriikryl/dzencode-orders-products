@@ -71,3 +71,24 @@ export const products: Product[] = orders.flatMap((order, orderIndex) => {
 })
 
 export const productTypes: string[] = [...new Set(products.map((p) => p.type))].sort()
+
+export function removeOrder(id: number): boolean {
+  const index = orders.findIndex((order) => order.id === id)
+  if (index === -1) return false
+
+  orders.splice(index, 1)
+
+  for (let i = products.length - 1; i >= 0; i -= 1) {
+    if (products[i]!.order === id) products.splice(i, 1)
+  }
+
+  return true
+}
+
+export function removeProduct(id: number): boolean {
+  const index = products.findIndex((product) => product.id === id)
+  if (index === -1) return false
+
+  products.splice(index, 1)
+  return true
+}

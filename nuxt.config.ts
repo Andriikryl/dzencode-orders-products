@@ -23,6 +23,13 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: false,
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          vuex: ['../node_modules/vuex/types/index.d.ts'],
+        },
+      },
+    },
   },
 
   css: [

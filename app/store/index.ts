@@ -16,6 +16,20 @@ export interface RootState {
   error: string | null
 }
 
+export interface DeleteOrderPayload {
+  order: Order
+  fetcher?: typeof $fetch
+}
+
+export interface DeleteProductPayload {
+  product: Product
+  fetcher?: typeof $fetch
+}
+
+function toMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback
+}
+
 export const storeKey: InjectionKey<Store<RootState>> = Symbol('store')
 
 export function buildStore() {
@@ -160,8 +174,18 @@ export function buildStore() {
         eventBus.emit({ type: 'filter:changed', value })
       },
 
-      deleteOrder({ commit, getters }, order: Order) {
+      async deleteOrder({ commit, getters }, payload: DeleteOrderPayload) {
+        const { order, fetcher = $fetch } = payload
         const productCount = (getters.productsByOrder[order.id] ?? []).length
+
+        commit('SET_ERROR', null)
+        try {
+          await fetcher(`/api/orders/${order.id}`, { method: 'DELETE' })
+        } catch (error) {
+          commit('SET_ERROR', toMessage(error, 'Не удалось удалить приход'))
+          return
+        }
+
         commit('REMOVE_ORDER', order.id)
         eventBus.emit({
           type: 'order:deleted',
@@ -171,7 +195,17 @@ export function buildStore() {
         })
       },
 
-      deleteProduct({ commit }, product: Product) {
+      async deleteProduct({ commit }, payload: DeleteProductPayload) {
+        const { product, fetcher = $fetch } = payload
+
+        commit('SET_ERROR', null)
+        try {
+          await fetcher(`/api/products/${product.id}`, { method: 'DELETE' })
+        } catch (error) {
+          commit('SET_ERROR', toMessage(error, 'Не удалось удалить продукт'))
+          return
+        }
+
         commit('REMOVE_PRODUCT', product.id)
         eventBus.emit({
           type: 'product:deleted',

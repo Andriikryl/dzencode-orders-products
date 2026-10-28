@@ -23,7 +23,7 @@ const orderTitles = computed<Record<number, string>>(() =>
 const pending = ref<Product | null>(null)
 
 function confirmDelete() {
-  if (pending.value) store.dispatch('deleteProduct', pending.value)
+  if (pending.value) store.dispatch('deleteProduct', { product: pending.value })
   pending.value = null
 }
 </script>
