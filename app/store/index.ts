@@ -83,16 +83,16 @@ export function buildStore() {
     },
 
     actions: {
-      async init({ commit, state }) {
+      async init({ commit, state }, fetcher: typeof $fetch = $fetch) {
         if (state.orders.length && state.products.length) return
 
         commit('SET_LOADING', true)
         commit('SET_ERROR', null)
         try {
           const [orders, products, types] = await Promise.all([
-            $fetch<Order[]>('/api/orders'),
-            $fetch<Product[]>('/api/products'),
-            $fetch<string[]>('/api/product-types'),
+            fetcher<Order[]>('/api/orders'),
+            fetcher<Product[]>('/api/products'),
+            fetcher<string[]>('/api/product-types'),
           ])
           commit('SET_ORDERS', orders)
           commit('SET_PRODUCTS', products)
