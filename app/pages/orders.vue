@@ -41,9 +41,9 @@ function confirmDelete() {
   if (!pending.value) return
 
   if (pending.value.kind === 'product') {
-    store.dispatch('deleteProduct', pending.value.product)
+    store.dispatch('deleteProduct', { product: pending.value.product })
   } else {
-    store.dispatch('deleteOrder', pending.value.order)
+    store.dispatch('deleteOrder', { order: pending.value.order })
   }
 
   pending.value = null

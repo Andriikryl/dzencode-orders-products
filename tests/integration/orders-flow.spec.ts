@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildStore } from '../../app/store'
 import { eventBus, type DomainEvent } from '../../app/lib/events'
 import type { Order, Product } from '../../app/types'
@@ -36,10 +36,20 @@ const products: Product[] = [
 
 let store: ReturnType<typeof buildStore>
 let seen: DomainEvent[]
+let fetcher: ReturnType<typeof vi.fn>
+
+function deleteOrder(order: Order) {
+  return store.dispatch('deleteOrder', { order, fetcher })
+}
+
+function deleteProduct(product: Product) {
+  return store.dispatch('deleteProduct', { product, fetcher })
+}
 
 beforeEach(() => {
   eventBus.clear()
   seen = []
+  fetcher = vi.fn(async () => ({}))
 
   store = buildStore()
   store.commit('SET_ORDERS', orders)
@@ -54,20 +64,20 @@ beforeEach(() => {
 
 describe('deleting an order', () => {
   it('drops the order together with its products', async () => {
-    await store.dispatch('deleteOrder', orders[0])
+    await deleteOrder(orders[0]!)
 
     expect(store.state.orders.map((order) => order.id)).toEqual([2])
     expect(store.state.products.map((product) => product.id)).toEqual([3])
   })
 
   it('announces the deletion with the number of products it carried', async () => {
-    await store.dispatch('deleteOrder', orders[0])
+    await deleteOrder(orders[0]!)
 
     expect(seen).toEqual([{ type: 'order:deleted', orderId: 1, title: 'Order 1', productCount: 2 }])
   })
 
   it('records the deletion in the activity feed', async () => {
-    await store.dispatch('deleteOrder', orders[0])
+    await deleteOrder(orders[0]!)
 
     expect(store.state.events).toHaveLength(1)
     expect(store.state.events[0]!.event.type).toBe('order:deleted')
@@ -77,7 +87,7 @@ describe('deleting an order', () => {
     await store.dispatch('toggleOrder', 1)
     expect(store.state.openOrderId).toBe(1)
 
-    await store.dispatch('deleteOrder', orders[0])
+    await deleteOrder(orders[0]!)
 
     expect(store.state.openOrderId).toBeNull()
   })
@@ -85,14 +95,14 @@ describe('deleting an order', () => {
 
 describe('deleting a product', () => {
   it('drops only that product and leaves its order alone', async () => {
-    await store.dispatch('deleteProduct', products[0])
+    await deleteProduct(products[0]!)
 
     expect(store.state.products.map((product) => product.id)).toEqual([2, 3])
     expect(store.state.orders).toHaveLength(2)
   })
 
   it('announces the deletion with the order it belonged to', async () => {
-    await store.dispatch('deleteProduct', products[0])
+    await deleteProduct(products[0]!)
 
     expect(seen).toEqual([
       { type: 'product:deleted', productId: 1, title: 'Product 1', orderId: 1 },
@@ -146,5 +156,50 @@ describe('the activity feed', () => {
 
     expect(store.state.events).toHaveLength(20)
     expect(new Set(store.state.events.map((entry) => entry.id)).size).toBe(20)
+  })
+})
+
+describe('talking to the server before removing anything', () => {
+  it('asks the API to delete the order', async () => {
+    await deleteOrder(orders[0]!)
+
+    expect(fetcher).toHaveBeenCalledWith('/api/orders/1', { method: 'DELETE' })
+  })
+
+  it('asks the API to delete the product', async () => {
+    await deleteProduct(products[0]!)
+
+    expect(fetcher).toHaveBeenCalledWith('/api/products/1', { method: 'DELETE' })
+  })
+
+  it('keeps the order when the request fails and reports the error', async () => {
+    fetcher = vi.fn(async () => {
+      throw new Error('boom')
+    })
+
+    await deleteOrder(orders[0]!)
+
+    expect(store.state.orders).toHaveLength(2)
+    expect(store.state.error).toBe('boom')
+    expect(seen).toEqual([])
+  })
+
+  it('keeps the product when the request fails', async () => {
+    fetcher = vi.fn(async () => {
+      throw new Error('boom')
+    })
+
+    await deleteProduct(products[0]!)
+
+    expect(store.state.products).toHaveLength(3)
+    expect(store.state.error).toBe('boom')
+  })
+
+  it('clears a previous error on the next successful delete', async () => {
+    store.commit('SET_ERROR', 'stale')
+
+    await deleteOrder(orders[0]!)
+
+    expect(store.state.error).toBeNull()
   })
 })
