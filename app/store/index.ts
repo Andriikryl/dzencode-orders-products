@@ -91,10 +91,14 @@ export function buildStore() {
         state.activeSessions = count
       },
       PUSH_EVENT(state, event: DomainEvent) {
+        const nextId = state.events.reduce((max, entry) => Math.max(max, entry.id), 0) + 1
         state.events = [
-          { id: state.events.length, event, at: new Date().toLocaleTimeString() },
+          { id: nextId, event, at: new Date().toLocaleTimeString() },
           ...state.events,
         ].slice(0, 20)
+      },
+      SET_EVENTS(state, events: RootState['events']) {
+        state.events = events.slice(0, 20)
       },
       REMOVE_ORDER(state, id: number) {
         state.orders = state.orders.filter((order) => order.id !== id)
