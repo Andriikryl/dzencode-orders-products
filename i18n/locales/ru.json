@@ -1,7 +1,8 @@
 {
   "nav": {
     "orders": "Приход",
-    "products": "Продукты"
+    "products": "Продукты",
+    "dashboard": "Сводка"
   },
   "topMenu": {
     "search": "Поиск",
@@ -34,5 +35,15 @@
     "cancel": "Отменить",
     "confirm": "Удалить",
     "close": "Закрыть"
+  },
+  "dashboard": {
+    "title": "Сводка",
+    "productsByType": "Продукты по типам",
+    "warehouses": "Склады",
+    "loading": "Загрузка...",
+    "activity": "Последние события",
+    "activityEmpty": "Событий пока не было. Откройте или удалите приход.",
+    "graph": "Связи приходов и типов",
+    "workerTotals": "Итоги, посчитанные в Web Worker"
   }
 }

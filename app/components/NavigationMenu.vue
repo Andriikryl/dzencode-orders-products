@@ -2,6 +2,7 @@
 const links = [
   { to: '/orders', key: 'nav.orders' },
   { to: '/products', key: 'nav.products' },
+  { to: '/dashboard', key: 'nav.dashboard' },
 ] as const
 </script>
 
