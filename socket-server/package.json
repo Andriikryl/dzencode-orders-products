@@ -1,0 +1,6 @@
+{
+  "name": "dzencode-socket-server",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}
