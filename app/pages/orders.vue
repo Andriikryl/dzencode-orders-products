@@ -10,7 +10,7 @@ useHead({ title: () => `${t('orders.title')} — Inventory` })
 const store = useAppStore()
 const { emit } = useDomainEvents()
 
-const orders = computed<Order[]>(() => store.state.orders)
+const orders = computed<Order[]>(() => store.getters.filteredOrders)
 const productsByOrder = computed<Record<number, Product[]>>(() => store.getters.productsByOrder)
 const openOrderId = computed(() => store.state.openOrderId)
 

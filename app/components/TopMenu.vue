@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { useSessionCounter } from '~/composables/useSessionCounter'
+import { useAppStore } from '~/composables/useAppStore'
 
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
 const MONTHS = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
@@ -27,6 +28,12 @@ const time = computed(() => dayjs(now.value).format('HH:mm:ss'))
 
 const { activeSessions } = useSessionCounter()
 
+const store = useAppStore()
+const search = computed({
+  get: () => store.state.search,
+  set: (value: string) => store.commit('SET_SEARCH', value),
+})
+
 const { locale, locales, setLocale } = useI18n()
 const localeOptions = computed(() => locales.value.map((item) => (typeof item === 'string' ? { code: item, name: item } : item)))
 </script>
@@ -40,6 +47,7 @@ const localeOptions = computed(() => locales.value.map((item) => (typeof item ==
 
     <div class="top-menu__search">
       <input
+        v-model="search"
         type="search"
         class="form-control"
         :placeholder="$t('topMenu.search')"

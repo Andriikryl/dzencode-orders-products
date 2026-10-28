@@ -9,6 +9,7 @@ export interface RootState {
   productTypes: string[]
   openOrderId: number | null
   typeFilter: string
+  search: string
   activeSessions: number
   events: Array<{ id: number; event: DomainEvent; at: string }>
   loading: boolean
@@ -25,6 +26,7 @@ export function buildStore() {
       productTypes: [],
       openOrderId: null,
       typeFilter: '',
+      search: '',
       activeSessions: 0,
       events: [],
       loading: false,
@@ -44,10 +46,26 @@ export function buildStore() {
         return getters.productsByOrder[id] ?? []
       },
 
-      filteredProducts: (state): Product[] =>
-        state.typeFilter
-          ? state.products.filter((product) => product.type === state.typeFilter)
-          : state.products,
+      filteredProducts: (state): Product[] => {
+        const query = state.search.trim().toLowerCase()
+
+        return state.products.filter((product) => {
+          if (state.typeFilter && product.type !== state.typeFilter) return false
+          if (!query) return true
+
+          return (
+            product.title.toLowerCase().includes(query) ||
+            product.type.toLowerCase().includes(query) ||
+            String(product.serialNumber).includes(query)
+          )
+        })
+      },
+
+      filteredOrders: (state): Order[] => {
+        const query = state.search.trim().toLowerCase()
+        if (!query) return state.orders
+        return state.orders.filter((order) => order.title.toLowerCase().includes(query))
+      },
     },
 
     mutations: {
@@ -65,6 +83,9 @@ export function buildStore() {
       },
       SET_TYPE_FILTER(state, type: string) {
         state.typeFilter = type
+      },
+      SET_SEARCH(state, value: string) {
+        state.search = value
       },
       SET_ACTIVE_SESSIONS(state, count: number) {
         state.activeSessions = count
