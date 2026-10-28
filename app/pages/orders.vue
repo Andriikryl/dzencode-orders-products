@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { Order, Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
-import { useDomainEvents } from '~/composables/useDomainEvents'
 
 const { t } = useI18n()
 
 useHead({ title: () => `${t('orders.title')} — Inventory` })
 
 const store = useAppStore()
-const { emit } = useDomainEvents()
+
+type PendingDelete = { kind: 'order'; order: Order } | { kind: 'product'; product: Product }
 
 const orders = computed<Order[]>(() => store.getters.filteredOrders)
 const productsByOrder = computed<Record<number, Product[]>>(() => store.getters.productsByOrder)
@@ -18,63 +18,48 @@ const openOrder = computed<Order | null>(
   () => orders.value.find((order) => order.id === openOrderId.value) ?? null,
 )
 const openProducts = computed<Product[]>(() =>
-  openOrderId.value === null ? [] : productsByOrder.value[openOrderId.value] ?? [],
+  openOrderId.value === null ? [] : (productsByOrder.value[openOrderId.value] ?? []),
 )
 
-const orderPendingDelete = ref<Order | null>(null)
-const productPendingDelete = ref<Product | null>(null)
-
-const dialogOpen = computed(() => orderPendingDelete.value !== null || productPendingDelete.value !== null)
+const pending = ref<PendingDelete | null>(null)
 
 const dialogQuestion = computed(() =>
-  productPendingDelete.value
-    ? t('dialog.deleteProduct')
-    : t('dialog.deleteOrder'),
+  pending.value?.kind === 'product' ? t('dialog.deleteProduct') : t('dialog.deleteOrder'),
 )
 
 const dialogProducts = computed<Product[]>(() => {
-  if (productPendingDelete.value) return [productPendingDelete.value]
-  if (!orderPendingDelete.value) return []
-  return productsByOrder.value[orderPendingDelete.value.id] ?? []
+  if (!pending.value) return []
+  if (pending.value.kind === 'product') return [pending.value.product]
+  return productsByOrder.value[pending.value.order.id] ?? []
 })
 
 function products(orderId: number): Product[] {
   return productsByOrder.value[orderId] ?? []
 }
 
-function closeDialog() {
-  orderPendingDelete.value = null
-  productPendingDelete.value = null
-}
-
 function confirmDelete() {
-  const product = productPendingDelete.value
-  const order = orderPendingDelete.value
+  if (!pending.value) return
 
-  if (product) {
-    store.commit('REMOVE_PRODUCT', product.id)
-    emit({ type: 'product:deleted', productId: product.id, title: product.title, orderId: product.order })
-  } else if (order) {
-    const count = products(order.id).length
-    store.commit('REMOVE_ORDER', order.id)
-    emit({ type: 'order:deleted', orderId: order.id, title: order.title, productCount: count })
+  if (pending.value.kind === 'product') {
+    store.dispatch('deleteProduct', pending.value.product)
+  } else {
+    store.dispatch('deleteOrder', pending.value.order)
   }
 
-  closeDialog()
-}
-
-function selectOrder(order: Order) {
-  store.dispatch('toggleOrder', order.id)
-  if (store.state.openOrderId === order.id) {
-    emit({ type: 'order:opened', orderId: order.id, title: order.title })
-  }
+  pending.value = null
 }
 </script>
 
 <template>
   <div class="orders">
     <header class="orders__header">
-      <button type="button" class="btn btn-success rounded-circle orders__add" :aria-label="$t('orders.add')">+</button>
+      <button
+        type="button"
+        class="btn btn-success rounded-circle orders__add"
+        :aria-label="$t('orders.add')"
+      >
+        +
+      </button>
       <h1 class="orders__title">{{ $t('orders.title') }} / {{ orders.length }}</h1>
     </header>
 
@@ -87,8 +72,8 @@ function selectOrder(order: Order) {
           :products="products(order.id)"
           :compact="Boolean(openOrder)"
           :active="order.id === openOrderId"
-          @select="selectOrder(order)"
-          @remove="orderPendingDelete = order"
+          @select="store.dispatch('toggleOrder', order.id)"
+          @remove="pending = { kind: 'order', order }"
         />
       </TransitionGroup>
 
@@ -98,17 +83,17 @@ function selectOrder(order: Order) {
           :order="openOrder"
           :products="openProducts"
           class="orders__panel"
-          @close="store.commit('SET_OPEN_ORDER', null)"
-          @remove-product="productPendingDelete = $event"
+          @close="store.dispatch('closeOrder')"
+          @remove-product="pending = { kind: 'product', product: $event }"
         />
       </Transition>
     </div>
 
     <ConfirmDeleteDialog
-      :open="dialogOpen"
+      :open="pending !== null"
       :question="dialogQuestion"
       :products="dialogProducts"
-      @cancel="closeDialog"
+      @cancel="pending = null"
       @confirm="confirmDelete"
     />
   </div>
@@ -176,7 +161,9 @@ function selectOrder(order: Order) {
 
 .panel-enter-active,
 .panel-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
 .panel-enter-from,

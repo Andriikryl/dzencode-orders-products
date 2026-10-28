@@ -1,44 +1,30 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
-import { useDomainEvents } from '~/composables/useDomainEvents'
 
 const { t } = useI18n()
 
 useHead({ title: () => `${t('products.title')} — Inventory` })
 
 const store = useAppStore()
-const { emit } = useDomainEvents()
 
 const filtered = computed<Product[]>(() => store.getters.filteredProducts)
 const types = computed<string[]>(() => store.state.productTypes)
 
 const typeFilter = computed({
   get: () => store.state.typeFilter,
-  set: (value: string) => {
-    store.commit('SET_TYPE_FILTER', value)
-    emit({ type: 'filter:changed', value })
-  },
+  set: (value: string) => store.dispatch('setTypeFilter', value),
 })
 
 const orderTitles = computed<Record<number, string>>(() =>
   Object.fromEntries(store.state.orders.map((order) => [order.id, order.title])),
 )
 
-const productPendingDelete = ref<Product | null>(null)
+const pending = ref<Product | null>(null)
 
 function confirmDelete() {
-  const product = productPendingDelete.value
-  if (product) {
-    store.commit('REMOVE_PRODUCT', product.id)
-    emit({
-      type: 'product:deleted',
-      productId: product.id,
-      title: product.title,
-      orderId: product.order,
-    })
-  }
-  productPendingDelete.value = null
+  if (pending.value) store.dispatch('deleteProduct', pending.value)
+  pending.value = null
 }
 </script>
 
@@ -62,7 +48,7 @@ function confirmDelete() {
         :key="product.id"
         :product="product"
         :order-title="orderTitles[product.order]"
-        @remove="productPendingDelete = product"
+        @remove="pending = product"
       />
     </TransitionGroup>
 
@@ -71,10 +57,10 @@ function confirmDelete() {
     </p>
 
     <ConfirmDeleteDialog
-      :open="productPendingDelete !== null"
+      :open="pending !== null"
       :question="$t('dialog.deleteProduct')"
-      :products="productPendingDelete ? [productPendingDelete] : []"
-      @cancel="productPendingDelete = null"
+      :products="pending ? [pending] : []"
+      @cancel="pending = null"
       @confirm="confirmDelete"
     />
   </div>

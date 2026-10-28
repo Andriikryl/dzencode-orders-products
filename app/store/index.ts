@@ -1,7 +1,7 @@
 import { createStore, type Store } from 'vuex'
 import type { InjectionKey } from 'vue'
 import type { Order, Product } from '~/types'
-import type { DomainEvent } from '~/lib/events'
+import { eventBus, type DomainEvent } from '~/lib/events'
 
 export interface RootState {
   orders: Order[]
@@ -128,14 +128,53 @@ export function buildStore() {
           commit('SET_PRODUCTS', products)
           commit('SET_PRODUCT_TYPES', types)
         } catch (error) {
-          commit('SET_ERROR', error instanceof Error ? error.message : 'Не удалось загрузить данные')
+          commit(
+            'SET_ERROR',
+            error instanceof Error ? error.message : 'Не удалось загрузить данные',
+          )
         } finally {
           commit('SET_LOADING', false)
         }
       },
 
       toggleOrder({ commit, state }, id: number) {
-        commit('SET_OPEN_ORDER', state.openOrderId === id ? null : id)
+        const opening = state.openOrderId !== id
+        commit('SET_OPEN_ORDER', opening ? id : null)
+
+        const order = state.orders.find((item) => item.id === id)
+        if (opening && order) {
+          eventBus.emit({ type: 'order:opened', orderId: id, title: order.title })
+        }
+      },
+
+      closeOrder({ commit }) {
+        commit('SET_OPEN_ORDER', null)
+      },
+
+      setTypeFilter({ commit }, value: string) {
+        commit('SET_TYPE_FILTER', value)
+        eventBus.emit({ type: 'filter:changed', value })
+      },
+
+      deleteOrder({ commit, getters }, order: Order) {
+        const productCount = (getters.productsByOrder[order.id] ?? []).length
+        commit('REMOVE_ORDER', order.id)
+        eventBus.emit({
+          type: 'order:deleted',
+          orderId: order.id,
+          title: order.title,
+          productCount,
+        })
+      },
+
+      deleteProduct({ commit }, product: Product) {
+        commit('REMOVE_PRODUCT', product.id)
+        eventBus.emit({
+          type: 'product:deleted',
+          productId: product.id,
+          title: product.title,
+          orderId: product.order,
+        })
       },
     },
   })
