@@ -51,6 +51,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       socketUrl: process.env.NUXT_PUBLIC_SOCKET_URL || 'http://localhost:3001',
+      vitalsEndpoint: process.env.NUXT_PUBLIC_VITALS_ENDPOINT || '',
     },
   },
 })
