@@ -55,7 +55,9 @@
     "happy-dom": "^21.0.4",
     "prettier": "^3.9.10",
     "sass-embedded": "^1.106.1",
+    "typescript": "^5.9.3",
     "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13",
     "web-vitals": "^6.2.3"
   }
 }
