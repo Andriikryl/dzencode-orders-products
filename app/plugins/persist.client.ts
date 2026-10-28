@@ -30,12 +30,14 @@ export default defineNuxtPlugin({
   dependsOn: ['vuex'],
   setup(nuxtApp) {
     const store = nuxtApp.$store as Store<RootState>
-    const saved = read()
 
-    if (saved) {
+    nuxtApp.hook('app:suspense:resolve', () => {
+      const saved = read()
+      if (!saved) return
+
       if (saved.typeFilter) store.commit('SET_TYPE_FILTER', saved.typeFilter)
       if (saved.openOrderId !== null) store.commit('SET_OPEN_ORDER', saved.openOrderId)
-    }
+    })
 
     store.subscribe((mutation, state) => {
       if (mutation.type !== 'SET_TYPE_FILTER' && mutation.type !== 'SET_OPEN_ORDER') return
