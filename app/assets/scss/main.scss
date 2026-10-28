@@ -1,0 +1,84 @@
+:root {
+  --c-accent: #8cc63e;
+  --c-accent-dark: #76ad31;
+  --c-text: #4d4d4d;
+  --c-text-muted: #9a9a9a;
+  --c-border: #e6e6e6;
+  --c-bg: #f4f5f7;
+  --c-surface: #ffffff;
+  --radius: 4px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --sidebar-width: 200px;
+  --topbar-height: 72px;
+}
+
+html,
+body,
+#__nuxt {
+  height: 100%;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-enter-active,
+.page-leave-active,
+.layout-enter-active,
+.layout-leave-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.page-enter-from,
+.layout-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-leave-to,
+.layout-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.surface {
+  --bs-card-border-color: var(--c-border);
+  --bs-card-border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &--clickable {
+    cursor: pointer;
+  }
+
+  &--clickable:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  &--active {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+.text-muted-sm {
+  color: var(--c-text-muted);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.accent {
+  color: var(--c-accent);
+}
