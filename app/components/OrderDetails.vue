@@ -13,10 +13,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="order-details card-row">
+  <section class="order-details card surface">
     <button
       type="button"
-      class="order-details__close"
+      class="btn btn-light rounded-circle order-details__close"
       :aria-label="$t('dialog.close')"
       @click="emit('close')"
     >
@@ -25,13 +25,13 @@ const emit = defineEmits<{
 
     <h2 class="order-details__title">{{ order.title }}</h2>
 
-    <button type="button" class="order-details__add">
+    <button type="button" class="btn btn-link p-0 order-details__add">
       <i class="bi bi-plus-circle-fill" />
       {{ $t('orders.addProduct') }}
     </button>
 
-    <ul class="order-details__list">
-      <li v-for="product in products" :key="product.id" class="order-details__item">
+    <ul class="list-group list-group-flush order-details__list">
+      <li v-for="product in products" :key="product.id" class="list-group-item order-details__item">
         <span
           class="order-details__status"
           :class="{ 'order-details__status--busy': product.status !== 'free' }"
@@ -43,7 +43,10 @@ const emit = defineEmits<{
           <span class="order-details__sn">SN-{{ product.serialNumber }}</span>
         </span>
 
-        <span class="order-details__state" :class="{ 'order-details__state--busy': product.status !== 'free' }">
+        <span
+          class="badge rounded-pill order-details__state"
+          :class="product.status === 'free' ? 'text-bg-light' : 'text-bg-secondary'"
+        >
           {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
         </span>
 

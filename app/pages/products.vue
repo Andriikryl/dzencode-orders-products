@@ -59,7 +59,7 @@ function confirmDelete() {
     </header>
 
     <TransitionGroup name="list" tag="div" class="products__list">
-      <article v-for="product in filtered" :key="product.id" class="product-row card-row">
+      <article v-for="product in filtered" :key="product.id" class="product-row card surface">
         <span
           class="product-row__status"
           :class="{ 'product-row__status--busy': product.status !== 'free' }"
@@ -72,12 +72,12 @@ function confirmDelete() {
           <div class="product-row__sn">SN-{{ product.serialNumber }}</div>
         </div>
 
-        <div
-          class="product-row__state"
-          :class="{ 'product-row__state--busy': product.status !== 'free' }"
+        <span
+          class="badge rounded-pill product-row__state"
+          :class="product.status === 'free' ? 'text-bg-light' : 'text-bg-secondary'"
         >
           {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
-        </div>
+        </span>
 
         <div class="product-row__guarantee">
           <div><span class="text-muted-sm">{{ $t('products.from') }}</span> {{ longDate(product.guarantee.start) }}</div>

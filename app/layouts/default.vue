@@ -4,7 +4,7 @@
 <template>
   <div class="layout">
     <TopMenu />
-    <div class="layout__body">
+    <div class="container-fluid px-0 layout__body">
       <NavigationMenu />
       <main class="layout__content">
         <slot />

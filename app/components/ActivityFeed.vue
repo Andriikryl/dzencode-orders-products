@@ -22,7 +22,7 @@ function describe(event: DomainEvent): string {
 </script>
 
 <template>
-  <section class="activity card-row">
+  <section class="activity card card-body surface">
     <h2 class="activity__title">{{ $t('dashboard.activity') }}</h2>
 
     <TransitionGroup v-if="entries.length" name="activity" tag="ul" class="activity__list">

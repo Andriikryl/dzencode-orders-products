@@ -50,10 +50,9 @@ a {
   transform: translateY(-8px);
 }
 
-.card-row {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius);
+.surface {
+  --bs-card-border-color: var(--c-border);
+  --bs-card-border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 

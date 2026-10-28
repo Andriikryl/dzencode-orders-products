@@ -74,7 +74,7 @@ function selectOrder(order: Order) {
 <template>
   <div class="orders">
     <header class="orders__header">
-      <button type="button" class="orders__add" :aria-label="$t('orders.add')">+</button>
+      <button type="button" class="btn btn-success rounded-circle orders__add" :aria-label="$t('orders.add')">+</button>
       <h1 class="orders__title">{{ $t('orders.title') }} / {{ orders.length }}</h1>
     </header>
 

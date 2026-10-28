@@ -26,44 +26,58 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 <template>
   <Teleport to="body">
     <Transition name="dialog">
-      <div v-if="open" class="dialog" role="dialog" aria-modal="true">
-        <div class="dialog__backdrop" @click="emit('cancel')" />
+      <div v-if="open" class="modal d-block dialog" tabindex="-1" role="dialog" aria-modal="true">
+        <div class="modal-backdrop show dialog__backdrop" @click="emit('cancel')" />
 
-        <div class="dialog__window">
-          <button
-            type="button"
-            class="dialog__close"
-            :aria-label="$t('dialog.close')"
-            @click="emit('cancel')"
-          >
-            <i class="bi bi-x-lg" />
-          </button>
-
-          <h2 class="dialog__title">{{ question }}</h2>
-
-          <ul v-if="products.length" class="dialog__products">
-            <li v-for="product in products" :key="product.id" class="dialog__product">
-              <span
-                class="dialog__status"
-                :class="{ 'dialog__status--busy': product.status !== 'free' }"
-              />
-              <ProductPhoto :type="product.type" class="dialog__photo" />
-              <span class="dialog__product-text">
-                <span class="dialog__product-title">{{ product.title }}</span>
-                <span class="dialog__product-sn">SN-{{ product.serialNumber }}</span>
-              </span>
-            </li>
-          </ul>
-
-          <footer class="dialog__footer">
-            <button type="button" class="dialog__cancel" @click="emit('cancel')">
-              {{ $t('dialog.cancel') }}
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content dialog__content">
+            <button
+              type="button"
+              class="btn btn-light rounded-circle dialog__close"
+              :aria-label="$t('dialog.close')"
+              @click="emit('cancel')"
+            >
+              <i class="bi bi-x-lg" />
             </button>
-            <button type="button" class="dialog__confirm" @click="emit('confirm')">
-              <i class="bi bi-trash" />
-              {{ $t('dialog.confirm') }}
-            </button>
-          </footer>
+
+            <div class="modal-header border-0">
+              <h2 class="modal-title h5 mb-0">{{ question }}</h2>
+            </div>
+
+            <div v-if="products.length" class="modal-body p-0 border-top">
+              <ul class="list-group list-group-flush dialog__products">
+                <li
+                  v-for="product in products"
+                  :key="product.id"
+                  class="list-group-item d-flex align-items-center gap-3 px-4"
+                >
+                  <span
+                    class="dialog__status"
+                    :class="{ 'dialog__status--busy': product.status !== 'free' }"
+                  />
+                  <ProductPhoto :type="product.type" class="dialog__photo" />
+                  <span class="d-flex flex-column min-w-0">
+                    <span class="dialog__product-title">{{ product.title }}</span>
+                    <small class="text-body-secondary">SN-{{ product.serialNumber }}</small>
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="modal-footer border-0 justify-content-end gap-3 dialog__footer">
+              <button type="button" class="btn btn-link dialog__cancel" @click="emit('cancel')">
+                {{ $t('dialog.cancel') }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-light rounded-pill px-4 dialog__confirm"
+                @click="emit('confirm')"
+              >
+                <i class="bi bi-trash me-2" />
+                {{ $t('dialog.confirm') }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </Transition>
@@ -72,26 +86,16 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 <style scoped>
 .dialog {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1050;
+  z-index: 1055;
 }
 
 .dialog__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(77, 90, 99, 0.65);
+  z-index: -1;
 }
 
-.dialog__window {
-  position: relative;
-  width: min(640px, calc(100% - 32px));
-  background: var(--c-surface);
+.dialog__content {
+  border: none;
   border-radius: var(--radius);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   overflow: visible;
 }
 
@@ -101,39 +105,15 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   right: -18px;
   width: 36px;
   height: 36px;
-  border: none;
-  border-radius: 50%;
-  background: var(--c-surface);
+  padding: 0;
   color: var(--c-text-muted);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-.dialog__title {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  padding: 28px 32px;
+  z-index: 1;
 }
 
 .dialog__products {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--c-border);
   max-height: 260px;
   overflow-y: auto;
-}
-
-.dialog__product {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 32px;
-}
-
-.dialog__product + .dialog__product {
-  border-top: 1px solid var(--c-border);
 }
 
 .dialog__status {
@@ -154,58 +134,29 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   flex: none;
 }
 
-.dialog__product-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 .dialog__product-title {
   text-decoration: underline;
-  color: var(--c-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dialog__product-sn {
-  color: var(--c-text-muted);
-  font-size: 12px;
-}
-
 .dialog__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  padding: 18px 24px;
   background: var(--c-accent);
   border-radius: 0 0 var(--radius) var(--radius);
 }
 
 .dialog__cancel {
-  border: none;
-  background: transparent;
   color: #fff;
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
+  text-decoration: none;
 }
 
 .dialog__confirm {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  border-radius: 999px;
-  background: #fff;
   color: #d9534f;
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 10px 28px;
-  cursor: pointer;
 }
 
 .dialog-enter-active,
@@ -213,8 +164,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   transition: opacity 0.2s ease;
 }
 
-.dialog-enter-active .dialog__window,
-.dialog-leave-active .dialog__window {
+.dialog-enter-active .modal-dialog,
+.dialog-leave-active .modal-dialog {
   transition: transform 0.2s ease;
 }
 
@@ -223,8 +174,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
   opacity: 0;
 }
 
-.dialog-enter-from .dialog__window,
-.dialog-leave-to .dialog__window {
+.dialog-enter-from .modal-dialog,
+.dialog-leave-to .modal-dialog {
   transform: scale(0.96);
 }
 </style>

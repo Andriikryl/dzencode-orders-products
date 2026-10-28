@@ -12,9 +12,9 @@ const links = [
       <i class="bi bi-person-circle" />
     </div>
 
-    <ul class="nav-menu__list">
-      <li v-for="link in links" :key="link.to" class="nav-menu__item">
-        <NuxtLink :to="link.to" class="nav-menu__link">
+    <ul class="nav flex-column nav-menu__list">
+      <li v-for="link in links" :key="link.to" class="nav-item nav-menu__item">
+        <NuxtLink :to="link.to" class="nav-link nav-menu__link">
           {{ $t(link.key) }}
         </NuxtLink>
       </li>

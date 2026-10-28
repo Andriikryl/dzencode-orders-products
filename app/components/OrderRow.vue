@@ -24,8 +24,8 @@ const totalUah = computed(() => sumByCurrency(prices.value, 'UAH'))
 
 <template>
   <article
-    class="order-row card-row card-row--clickable"
-    :class="{ 'order-row--compact': compact, 'card-row--active': active }"
+    class="order-row card surface surface--clickable"
+    :class="{ 'order-row--compact': compact, 'surface--active': active }"
     @click="emit('select')"
   >
     <h3 v-if="!compact" class="order-row__title">{{ order.title }}</h3>
