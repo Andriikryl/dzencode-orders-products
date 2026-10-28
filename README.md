@@ -12,13 +12,13 @@ Built as a test assignment. Stack: Nuxt 4 (Vue 3, SSR) + Vuex 4 + Bootstrap 5 + 
 
 - list of orders with the number of products, the creation date in two formats and the total in two currencies;
 - clicking an order opens its products in a panel next to the list; the panel closes with the cross;
-- deleting an order or a single product goes through a confirmation dialog.
+- deleting an order or a single product goes through a confirmation dialog and a `DELETE` request, so it survives a reload.
 
 **Products** (`/products`)
 
 - every product with a filter by type;
 - each row shows the title, serial number, condition, guarantee period, price in two currencies, type, the order it belongs to and the date;
-- deleting a product goes through a confirmation dialog.
+- deleting a product goes through a confirmation dialog and a `DELETE` request.
 
 **Dashboard** (`/dashboard`)
 
@@ -170,7 +170,7 @@ app/
   lib/          domain event bus
   utils/        date and amount formatting
 server/
-  api/          REST endpoints and GraphQL
+  api/          REST endpoints (GET lists, DELETE by id) and GraphQL
   middleware/   session and auth
   utils/        data generation, GraphQL schema, JWT
 socket-server/  standalone Socket.IO service
@@ -189,5 +189,7 @@ tests/          unit, integration, functional
 **Persistence.** The type filter and the open order live in a cookie, so the server sees them and server and client render the same markup. The activity feed lives in `localStorage`, since it does not affect server rendering.
 
 **Performance.** The heavy dashboard blocks load lazily and on the client only, order totals are computed in a Web Worker, and Web Vitals are reported to an endpoint when one is configured.
+
+**Data.** Orders and products are generated in memory on the server (`server/utils/data.ts`). `DELETE /api/orders/:id` also drops the products of that order; `DELETE /api/products/:id` drops a single one. Since the data lives in the process, restarting the server restores the original set.
 
 **Styling.** BEM class names, scoped styles, Bootstrap 5 underneath.
