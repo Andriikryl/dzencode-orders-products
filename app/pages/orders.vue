@@ -2,7 +2,9 @@
 import type { Order, Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
 
-useHead({ title: 'Приходы — Inventory' })
+const { t } = useI18n()
+
+useHead({ title: () => `${t('orders.title')} — Inventory` })
 
 const store = useAppStore()
 
@@ -24,8 +26,8 @@ const dialogOpen = computed(() => orderPendingDelete.value !== null || productPe
 
 const dialogQuestion = computed(() =>
   productPendingDelete.value
-    ? 'Вы уверены, что хотите удалить этот продукт?'
-    : 'Вы уверены, что хотите удалить этот приход?',
+    ? t('dialog.deleteProduct')
+    : t('dialog.deleteOrder'),
 )
 
 const dialogProducts = computed<Product[]>(() => {
@@ -56,8 +58,8 @@ function confirmDelete() {
 <template>
   <div class="orders">
     <header class="orders__header">
-      <button type="button" class="orders__add" aria-label="Добавить приход">+</button>
-      <h1 class="orders__title">Приходы / {{ orders.length }}</h1>
+      <button type="button" class="orders__add" :aria-label="$t('orders.add')">+</button>
+      <h1 class="orders__title">{{ $t('orders.title') }} / {{ orders.length }}</h1>
     </header>
 
     <div class="orders__body" :class="{ 'orders__body--split': openOrder }">

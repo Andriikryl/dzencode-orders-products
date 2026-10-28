@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
 import { useAppStore } from '~/composables/useAppStore'
-import { formatAmount, formatLongDate, formatShortDate } from '~/utils/format'
+import { useLocaleFormat } from '~/composables/useLocaleFormat'
 
-useHead({ title: 'Продукты — Inventory' })
+const { t } = useI18n()
+
+useHead({ title: () => `${t('products.title')} — Inventory` })
 
 const store = useAppStore()
+const { shortDate, longDate, amount } = useLocaleFormat()
 
 const filtered = computed<Product[]>(() => store.getters.filteredProducts)
 const types = computed<string[]>(() => store.state.productTypes)
@@ -21,7 +24,7 @@ const orderTitles = computed<Record<number, string>>(() =>
 
 function priceIn(product: Product, symbol: 'USD' | 'UAH'): string {
   const entry = product.price.find((price) => price.symbol === symbol)
-  return entry ? formatAmount(entry.value) : '—'
+  return entry ? amount(entry.value) : '—'
 }
 
 const productPendingDelete = ref<Product | null>(null)
@@ -37,12 +40,12 @@ function confirmDelete() {
 <template>
   <div class="products">
     <header class="products__header">
-      <h1 class="products__title">Продукты / {{ filtered.length }}</h1>
+      <h1 class="products__title">{{ $t('products.title') }} / {{ filtered.length }}</h1>
 
       <label class="products__filter">
-        <span class="products__filter-label">Тип:</span>
+        <span class="products__filter-label">{{ $t('products.type') }}</span>
         <select v-model="typeFilter" class="form-select form-select-sm">
-          <option value="">Все типы</option>
+          <option value="">{{ $t('products.allTypes') }}</option>
           <option v-for="type in types" :key="type" :value="type">{{ type }}</option>
         </select>
       </label>
@@ -66,15 +69,15 @@ function confirmDelete() {
           class="product-row__state"
           :class="{ 'product-row__state--busy': product.status !== 'free' }"
         >
-          {{ product.status === 'free' ? 'Свободен' : 'В ремонте' }}
+          {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
         </div>
 
         <div class="product-row__guarantee">
-          <div><span class="text-muted-sm">с</span> {{ formatLongDate(product.guarantee.start) }}</div>
-          <div><span class="text-muted-sm">по</span> {{ formatLongDate(product.guarantee.end) }}</div>
+          <div><span class="text-muted-sm">{{ $t('products.from') }}</span> {{ longDate(product.guarantee.start) }}</div>
+          <div><span class="text-muted-sm">{{ $t('products.to') }}</span> {{ longDate(product.guarantee.end) }}</div>
         </div>
 
-        <div class="product-row__condition">{{ product.isNew ? 'Новый' : 'Б / У' }}</div>
+        <div class="product-row__condition">{{ product.isNew ? $t('products.new') : $t('products.used') }}</div>
 
         <div class="product-row__price">
           <div class="text-muted-sm">{{ priceIn(product, 'USD') }} $</div>
@@ -86,14 +89,14 @@ function confirmDelete() {
         <div class="product-row__order">{{ orderTitles[product.order] ?? '—' }}</div>
 
         <div class="product-row__date">
-          <div class="text-muted-sm">{{ formatShortDate(product.date) }}</div>
-          <div>{{ formatLongDate(product.date) }}</div>
+          <div class="text-muted-sm">{{ shortDate(product.date) }}</div>
+          <div>{{ longDate(product.date) }}</div>
         </div>
 
         <button
           type="button"
           class="product-row__delete"
-          aria-label="Удалить продукт"
+          :aria-label="$t('products.delete')"
           @click="productPendingDelete = product"
         >
           <i class="bi bi-trash" />
@@ -102,12 +105,12 @@ function confirmDelete() {
     </TransitionGroup>
 
     <p v-if="!filtered.length" class="products__empty">
-      По выбранному типу продуктов нет.
+      {{ $t('products.empty') }}
     </p>
 
     <ConfirmDeleteDialog
       :open="productPendingDelete !== null"
-      question="Вы уверены, что хотите удалить этот продукт?"
+      :question="$t('dialog.deleteProduct')"
       :products="productPendingDelete ? [productPendingDelete] : []"
       @cancel="productPendingDelete = null"
       @confirm="confirmDelete"

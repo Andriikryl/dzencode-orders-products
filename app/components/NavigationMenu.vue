@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const links = [
-  { to: '/orders', label: 'Приход' },
-  { to: '/products', label: 'Продукты' },
+  { to: '/orders', key: 'nav.orders' },
+  { to: '/products', key: 'nav.products' },
 ] as const
 </script>
 
@@ -14,7 +14,7 @@ const links = [
     <ul class="nav-menu__list">
       <li v-for="link in links" :key="link.to" class="nav-menu__item">
         <NuxtLink :to="link.to" class="nav-menu__link">
-          {{ link.label }}
+          {{ $t(link.key) }}
         </NuxtLink>
       </li>
     </ul>

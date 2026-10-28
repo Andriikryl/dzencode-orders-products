@@ -33,7 +33,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
           <button
             type="button"
             class="dialog__close"
-            aria-label="Закрыть"
+            :aria-label="$t('dialog.close')"
             @click="emit('cancel')"
           >
             <i class="bi bi-x-lg" />
@@ -57,11 +57,11 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
           <footer class="dialog__footer">
             <button type="button" class="dialog__cancel" @click="emit('cancel')">
-              Отменить
+              {{ $t('dialog.cancel') }}
             </button>
             <button type="button" class="dialog__confirm" @click="emit('confirm')">
               <i class="bi bi-trash" />
-              Удалить
+              {{ $t('dialog.confirm') }}
             </button>
           </footer>
         </div>

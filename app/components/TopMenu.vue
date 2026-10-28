@@ -26,6 +26,9 @@ const date = computed(() => {
 const time = computed(() => dayjs(now.value).format('HH:mm:ss'))
 
 const { activeSessions } = useSessionCounter()
+
+const { locale, locales, setLocale } = useI18n()
+const localeOptions = computed(() => locales.value.map((item) => (typeof item === 'string' ? { code: item, name: item } : item)))
 </script>
 
 <template>
@@ -39,13 +42,24 @@ const { activeSessions } = useSessionCounter()
       <input
         type="search"
         class="form-control"
-        placeholder="Поиск"
-        aria-label="Поиск"
+        :placeholder="$t('topMenu.search')"
+        :aria-label="$t('topMenu.search')"
       >
     </div>
 
     <div class="top-menu__meta">
-      <div class="top-menu__sessions" :title="'Активных сессий в браузерах'">
+      <select
+        class="form-select form-select-sm top-menu__locale"
+        :value="locale"
+        :aria-label="'Language'"
+        @change="setLocale(($event.target as HTMLSelectElement).value as typeof locale)"
+      >
+        <option v-for="item in localeOptions" :key="item.code" :value="item.code">
+          {{ item.name }}
+        </option>
+      </select>
+
+      <div class="top-menu__sessions" :title="$t('topMenu.sessions')">
         <i class="bi bi-people-fill" />
         <ClientOnly>
           <span class="top-menu__sessions-count">{{ activeSessions }}</span>
@@ -109,6 +123,10 @@ const { activeSessions } = useSessionCounter()
   display: flex;
   align-items: center;
   gap: 24px;
+}
+
+.top-menu__locale {
+  width: auto;
 }
 
 .top-menu__sessions {

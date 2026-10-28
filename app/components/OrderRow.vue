@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Order, Product } from '~/types'
-import { formatAmount, formatLongDate, formatShortDate, sumByCurrency } from '~/utils/format'
+import { sumByCurrency } from '~/utils/format'
+import { useLocaleFormat } from '~/composables/useLocaleFormat'
 
 const props = defineProps<{
   order: Order
@@ -13,6 +14,8 @@ const emit = defineEmits<{
   select: []
   remove: []
 }>()
+
+const { shortDate, longDate, amount } = useLocaleFormat()
 
 const prices = computed(() => props.products.map((product) => product.price))
 const totalUsd = computed(() => sumByCurrency(prices.value, 'USD'))
@@ -31,25 +34,25 @@ const totalUah = computed(() => sumByCurrency(prices.value, 'UAH'))
       <span class="order-row__count-icon"><i class="bi bi-list-ul" /></span>
       <span>
         <span class="order-row__count-value">{{ products.length }}</span>
-        <span class="text-muted-sm d-block">Продукта</span>
+        <span class="text-muted-sm d-block">{{ $t('orders.products') }}</span>
       </span>
     </div>
 
     <div class="order-row__date">
-      <div class="text-muted-sm">{{ formatShortDate(order.date) }}</div>
-      <div>{{ formatLongDate(order.date) }}</div>
+      <div class="text-muted-sm">{{ shortDate(order.date) }}</div>
+      <div>{{ longDate(order.date) }}</div>
     </div>
 
     <div v-if="!compact" class="order-row__sum">
-      <div class="text-muted-sm">{{ formatAmount(totalUsd) }} $</div>
-      <div>{{ formatAmount(totalUah) }} <span class="order-row__currency">UAH</span></div>
+      <div class="text-muted-sm">{{ amount(totalUsd) }} $</div>
+      <div>{{ amount(totalUah) }} <span class="order-row__currency">UAH</span></div>
     </div>
 
     <button
       v-if="!compact"
       type="button"
       class="order-row__delete"
-      aria-label="Удалить приход"
+      :aria-label="$t('orders.delete')"
       @click.stop="emit('remove')"
     >
       <i class="bi bi-trash" />

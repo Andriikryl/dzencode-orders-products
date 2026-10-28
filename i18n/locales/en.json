@@ -1,0 +1,32 @@
+{
+  "nav": { "orders": "Orders", "products": "Products" },
+  "topMenu": { "search": "Search", "sessions": "Active sessions" },
+  "orders": {
+    "title": "Orders",
+    "add": "Add order",
+    "products": "Products",
+    "delete": "Delete order",
+    "addProduct": "Add product",
+    "empty": "This order has no products yet."
+  },
+  "products": {
+    "title": "Products",
+    "type": "Type:",
+    "allTypes": "All types",
+    "delete": "Delete product",
+    "empty": "No products of the selected type.",
+    "new": "New",
+    "used": "Used",
+    "free": "Free",
+    "inRepair": "In repair",
+    "from": "from",
+    "to": "to"
+  },
+  "dialog": {
+    "deleteOrder": "Are you sure you want to delete this order?",
+    "deleteProduct": "Are you sure you want to delete this product?",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "close": "Close"
+  }
+}

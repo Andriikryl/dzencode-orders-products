@@ -17,7 +17,7 @@ const emit = defineEmits<{
     <button
       type="button"
       class="order-details__close"
-      aria-label="Закрыть"
+      :aria-label="$t('dialog.close')"
       @click="emit('close')"
     >
       <i class="bi bi-x-lg" />
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 
     <button type="button" class="order-details__add">
       <i class="bi bi-plus-circle-fill" />
-      Добавить продукт
+      {{ $t('orders.addProduct') }}
     </button>
 
     <ul class="order-details__list">
@@ -44,13 +44,13 @@ const emit = defineEmits<{
         </span>
 
         <span class="order-details__state" :class="{ 'order-details__state--busy': product.status !== 'free' }">
-          {{ product.status === 'free' ? 'Свободен' : 'В ремонте' }}
+          {{ product.status === 'free' ? $t('products.free') : $t('products.inRepair') }}
         </span>
 
         <button
           type="button"
           class="order-details__delete"
-          aria-label="Удалить продукт"
+          :aria-label="$t('products.delete')"
           @click="emit('removeProduct', product)"
         >
           <i class="bi bi-trash" />
@@ -59,7 +59,7 @@ const emit = defineEmits<{
     </ul>
 
     <p v-if="!products.length" class="order-details__empty">
-      В этом приходе пока нет продуктов.
+      {{ $t('orders.empty') }}
     </p>
   </section>
 </template>
