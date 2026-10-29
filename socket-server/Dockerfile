@@ -4,6 +4,5 @@ WORKDIR /app
 COPY package.json ./
 RUN pnpm add socket.io@4 --prod
 COPY index.js ./
-ENV SOCKET_PORT=3001
 EXPOSE 3001
 CMD ["node", "index.js"]

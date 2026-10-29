@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: dzencode-socket
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./socket-server/Dockerfile
+    dockerContext: ./socket-server
+    healthCheckPath: /health
+    envVars:
+      - key: SOCKET_CORS_ORIGIN
+        sync: false
+
+  - type: web
+    name: dzencode-app
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NUXT_PUBLIC_SOCKET_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
