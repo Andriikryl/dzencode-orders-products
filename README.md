@@ -6,6 +6,16 @@ Built as a test assignment. Stack: Nuxt 4 (Vue 3, SSR) + Vuex 4 + Bootstrap 5 + 
 
 ---
 
+## Live demo
+
+<https://dzencode-app.onrender.com>
+
+Deployed on Render as two Docker services described in `render.yaml`: the Nuxt app and a standalone Socket.IO server.
+
+Both run on the free plan, so they sleep after about 15 minutes without traffic. The first request after that wakes them and can take up to a minute — later requests are immediate.
+
+---
+
 ## Features
 
 **Orders** (`/orders`)
