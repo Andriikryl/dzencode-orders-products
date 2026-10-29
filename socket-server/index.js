@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
 
-const PORT = Number(process.env.SOCKET_PORT || 3001)
+const PORT = Number(process.env.PORT || process.env.SOCKET_PORT || 3001)
 const ORIGIN = process.env.SOCKET_CORS_ORIGIN || '*'
 
 const httpServer = createServer((req, res) => {

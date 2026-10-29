@@ -7,7 +7,7 @@ export function useSessionCounter() {
   let socket: Socket | undefined
 
   onMounted(() => {
-    socket = io(config.public.socketUrl, { transports: ['websocket'] })
+    socket = io(config.public.socketUrl)
     socket.on('sessions', (count: number) => {
       store.commit('SET_ACTIVE_SESSIONS', count)
     })
