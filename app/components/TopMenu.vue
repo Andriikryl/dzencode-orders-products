@@ -152,7 +152,10 @@ const localeOptions = computed(() =>
 }
 
 .top-menu__clock {
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .top-menu__weekday {
